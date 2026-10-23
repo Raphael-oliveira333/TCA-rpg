@@ -4,6 +4,9 @@ constructor(){
 this.jogador ;
 this.monstro;
 this.fase = 1
+this.derrotados = 0;
+this.contador = 0;
+
 }
 // iniciar jogo
 iniciar() {
@@ -15,6 +18,13 @@ this.criarPersonagem()
 // fase 1
 this.fase1()
 //........
+if(this.jogador.vida > 0)
+{
+// resto do jogo 
+
+
+
+}
 
 }
 else { 
@@ -49,14 +59,15 @@ if(this.monstro.nome == "Anão")
 }
 if(this.monstro.nome == "Ogro")
 {
-  this.monstro.vida += 20
-  this.monstro.ataque += 5
+  this.monstro.vida += 10
+  this.monstro.ataque += 3
+  this.monstro.experiencia += 30
 }
 }
 
 // fases
 fase1(){
-  while(this.fase == 1 && this.jogador.vida > 0) 
+  while(this.fase == 1 && this.jogador.vida > 0 ) 
   { 
     this.gerarMonstro()
   
@@ -76,7 +87,8 @@ fase1(){
     console.clear()
   this.jogador.usarInventario()
   }
-  if (desicao === 1){
+
+  if(this.monstro.vida > 0){
     console.log("\n\n")
   console.log(`Vez do ${this.monstro.nome}`)
   this.jogador.receberDano(this.monstro.ataque)
@@ -85,6 +97,13 @@ fase1(){
   
   
   }
+  this.derrotados ++
+  if(this.derrotados >= 100)
+  {
+    this.jogador.conquistas.push("Falta do que fazer")
+    console.log(`${this.jogador.nome} devastou vilas de Goblins inteiras. Realmente ele não tinha nada melhor para fazer`)
+  }
+  this.contador ++
   if(this.jogador.vida > 0) {
     console.clear()
     let chance = Math.trunc(Math.random()*10)
@@ -103,6 +122,22 @@ fase1(){
       this.jogador.controleStatus()
     }
   }
+  if(this.contador == 10){
+    console.log(`${this.jogador.nome} venceu o primeiro nivel \nDeseja repetir o nivel? (recomendado)\n[1] Sim \n[2] Não`)
+    let decisao = prompt("Digite a opção desejada")
+    if(decisao == 1){
+      this.contador == 0 
+    }
+    else{
+      console.log(`${this.jogador.nome} decide avançar em busca de seus objetivos`)
+      this.fase ++
+    }
+  }
+  
+  }
+  else{
+    console.log(`${this.jogador.nome} foi derrotado`)
+    // mostrar conquistas
   }
   
   }
@@ -144,7 +179,9 @@ class Personagem {
       this.experiencia = 0;
       this.nivel = 1; 
       this.pontos = 0;
+      this.saude = 0;
       this.inventario = ["Poção de Cura"];
+      this.conquistas = [];
     }
   
     exibirMenu() {
@@ -164,7 +201,7 @@ class Personagem {
           console.log(`Vida : ${this.vida} + 20`)
           this.vida += 20
          }
-        if(itemUsado == "Maça Doce")
+        if(itemUsado == "Maçã Doce")
         {
           console.log(`${this.nome} usou ${itemUsado}`)
           console.log(`Vida : ${this.vida} + 30`)
@@ -193,8 +230,11 @@ class Personagem {
     }
   
     subirNivel() {
-      while (this.experiencia >= 100) {
-        this.experiencia -= 100;
+      
+      let balanceamento = (((this.nivel)/10 ) * 100) + 100
+      while (this.experiencia >= balanceamento) {
+        this.vida = 100 + this.saude
+        this.experiencia -= balanceamento;
         this.nivel += 1;
         this.pontos += 2;
         console.log(`${this.nome} subiu para o nível ${this.nivel} e recebeu 2 pontos!\nPontos disponíveis: ${this.pontos}`);
@@ -219,6 +259,7 @@ class Personagem {
           this.pontos--;
           console.log(`Defesa aumentada para: ${this.defesa}`);
         } else if (upar === 3) {
+          this.saude += 5
           this.vida += 5;
           this.pontos--;
           console.log(`Vida aumentada para: ${this.vida}`);
