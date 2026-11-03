@@ -51,17 +51,20 @@ this.monstro = new Monstro(nome)
 if(this.monstro.nome == "Goblin")
 {
 this.monstro.vida -= 20
+this.monstro.moedas = 1
 }
 if(this.monstro.nome == "Anão")
 {
   this.monstro.vida += 20
   this.monstro.ataque -= 3
+  this.monstro.moedas = 2
 }
 if(this.monstro.nome == "Ogro")
 {
   this.monstro.vida += 10
   this.monstro.ataque += 3
   this.monstro.experiencia += 30
+  this.monstro.moedas = 3
 }
 }
 
@@ -79,13 +82,16 @@ fase1(){
   
     console.log("Sua vez")
     this.jogador.exibirMenu() 
-    let desicao = parseInt(prompt("digite a opção desejada"))
-    if(desicao === 1){
+    let decisao = parseInt(prompt("digite a opção desejada"))
+    if(decisao === 1){
       this.monstro.receberDano(this.jogador.ataque)
     }
-  if(desicao === 2){
+  if(decisao === 2){
     console.clear()
   this.jogador.usarInventario()
+  }
+  if(decisao == 3){
+    this.jogador.loja()
   }
 
   if(this.monstro.vida > 0){
@@ -98,6 +104,8 @@ fase1(){
   
   }
   this.derrotados ++
+  this.jogador.moedas += this.monstro.moedas
+  
   if(this.derrotados >= 100)
   {
     this.jogador.conquistas.push("Falta do que fazer")
@@ -106,6 +114,7 @@ fase1(){
   this.contador ++
   if(this.jogador.vida > 0) {
     console.clear()
+    console.log(`O ${this.monstro.nome} soltou ${this.monstro.moedas} moedas`)
     let chance = Math.trunc(Math.random()*10)
     if(chance >= 5)
     {
@@ -126,7 +135,7 @@ fase1(){
     console.log(`${this.jogador.nome} venceu o primeiro nivel \nDeseja repetir o nivel? (recomendado)\n[1] Sim \n[2] Não`)
     let decisao = prompt("Digite a opção desejada")
     if(decisao == 1){
-      this.contador == 0 
+      this.contador = 0 
     }
     else{
       console.log(`${this.jogador.nome} decide avançar em busca de seus objetivos`)
@@ -156,6 +165,7 @@ fase1(){
 
 class Monstro {
  constructor(nome){
+  this.moedas = 0;
   this.vida = 100;
   this.ataque = 5;
   this.nome = nome;
@@ -182,10 +192,11 @@ class Personagem {
       this.saude = 0;
       this.inventario = ["Poção de Cura"];
       this.conquistas = [];
+      this.moedas = 0;
     }
   
     exibirMenu() {
-      console.log("[1] Ataque básico \n[2] Acessar inventário");
+      console.log("[1] Ataque básico \n[2] Acessar inventário\n[3] Acessar loja");
     }
   
     usarInventario() {
@@ -275,6 +286,39 @@ class Personagem {
         }
       }
     }
+    loja() {
+      
+     let ItensPossiveis = ["Poção de Cura" , "Poção de Força", "Maçã Doce","Casaco de Couro"]
+     let itensVenda = []
+     for(let i = 0; i < 3; i ++){
+      itensVenda.push(ItensPossiveis[Math.trunc((Math.random()*ItensPossiveis.length))])
+     }
+     console.log(`Bem-vindo a loja, aventureiro \nO que deseja?\n\n[1] : ${itensVenda[0]} 20 moedas\n[2] : ${itensVenda[1]} 20 moedas\n[3] : ${itensVenda[2]} 20 moedas\n[4] sair`)
+     let decisao = parseInt(prompt(` Vocẽ possui ${this.moedas} moedas \nDigite a opçao`))
+if(this.moedas >= 20 && (decisao >= 1 && decisao <= 3)){
+  
+
+if(decisao == 1){
+  console.log(`${this.nome} comprou ${itensVenda[0]}`)
+this.moedas -= 20
+this.inventario.push(itensVenda[0])
+}
+if(decisao == 2){
+  console.log(`${this.nome} comprou ${itensVenda[2]}`)
+this.moedas -= 20
+this.inventario.push(itensVenda[2])
+}
+if(decisao == 3){
+  console.log(`${this.nome} comprou ${itensVenda[3]}`)
+this.moedas -= 20
+this.inventario.push(itensVenda[3])
+}
+if(decisao == 4){
+  console.log(" Sem dinheiro ?")
+}
+    }
+    else{ console.log('Vocẽ não possui dinheiro suficiente')}
+  }
   }
   
 
@@ -284,4 +328,4 @@ class Personagem {
 
 
   //git config --global user.email "raphaoliveira415@gmail.com"
-  //git config --global user.name "Raphael-oliveira333"
+ // git config --global user.name "Raphael-oliveira333"
