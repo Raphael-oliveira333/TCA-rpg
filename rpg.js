@@ -6,7 +6,8 @@ this.monstro;
 this.fase = 1
 this.derrotados = 0;
 this.contador = 0;
-this.skillsJogo = [{nome : "Bola de Fogo" , dano : 40 , custo : 100, execucao(){console.log("Uma bola de fogo é invocada")}}
+this.skillsJogo = [{nome : "Bola de Fogo" , dano : 40 , cura : 0 , custo : 100, execucao(){console.log("Uma bola de fogo é invocada")}},
+  {nome : "Magia de Cura" , dano : 0, cura : 60 , custo : 150, execucao(){console.log(`${this.jogador.nome} reestabelece suas forças\n + 60 de vida`)}}
 
 ];
 
@@ -42,17 +43,27 @@ else {
 criarPersonagem()
 { let nome = prompt("Digite o nome do seu personagem para iniciar")
     this.jogador = new Personagem(nome)
-    this.jogador.skils.push(this.skillsJogo[0])
-    this.skillsJogo.pop()
+    this.jogador.skills.push(this.skillsJogo[0])
+  
 }
 
-usoSkils(skils){
-console.log(`[1] : ${skils[0].nome}`)
-let skil = parseInt(prompt("Qual deseja usar?"))
-if(this.jogador.mana >= skils[skil - 1].custo){
-  skils[skil - 1].execucao()
-  this.monstro.receberDano(skils[skil - 1].dano)
-  this.jogador.mana -= skils[skil - 1].custo
+usoSkills(skils){
+console.log(`[1] : ${skils[0].nome}\n`)
+if(this.jogador.skills.length >= 2)
+{
+  console.log(`[2] : ${skils[1].nome}\n`)
+}
+if(this.jogador.skills.length >= 2)
+  {
+    console.log(`[3] : ${skils[2].nome}\n`)
+  }
+
+
+let skill = parseInt(prompt("Qual deseja usar?"))
+if(this.jogador.mana >= skils[skill - 1].custo){
+  skils[skill - 1].execucao()
+  this.monstro.receberDano(skils[skill - 1].dano)
+  this.jogador.mana -= skils[skill - 1].custo
 }
 else{
   console.log(`${this.jogador.nome} não possui mana suficiente`)
@@ -72,24 +83,24 @@ this.monstro = new Monstro(nome)
 if(this.monstro.nome == "Goblin")
 {
 this.monstro.vida += -20 + balanceamento
-this.monstro.moedas = 1
+this.monstro.moedas = 5
 }
 if(this.monstro.nome == "Anão")
 {
   this.monstro.vida += 20 + balanceamento
   this.monstro.ataque += -3 + balanceamento
-  this.monstro.moedas = 2 
+  this.monstro.moedas = 6
 }
 if(this.monstro.nome == "Ogro")
 {
   this.monstro.vida += 10 + balanceamento
   this.monstro.ataque += 3 + balanceamento
   this.monstro.experiencia += 30
-  this.monstro.moedas = 3
+  this.monstro.moedas = 9
 }
 if(this.contador %5 == 0 && this.contador != 0){
-  this.monstro.vida += balanceamento + 10
-  this.monstro.ataque += balanceamento + 10
+  this.monstro.vida +=  + 10
+  this.monstro.ataque +=  + 10
 }
 }
 
@@ -97,6 +108,10 @@ if(this.contador %5 == 0 && this.contador != 0){
 fase1(){
   while(this.fase == 1 && this.jogador.vida > 0 ) 
   { 
+    if(this.jogador.nivel == 5 && this.jogador.skills.length == 1){
+      this.jogador.skills.push(this.skillsJogo[1])
+      console.log(`${this.jogador.nome} aprendeu uma nova skill: ${this.skillsJogo[1].nome}`)
+    }
     this.gerarMonstro()
   if(this.contador%5 == 0 && this.contador != 0){
     console.log(`Um ${this.monstro.nome} mais forte aparece`)
@@ -107,7 +122,7 @@ fase1(){
   while(this.jogador.vida > 0 && this.monstro.vida > 0)
   {
 
-    console.log("Sua vez")
+    console.log(`Turno de ${this.jogador.nome}`)
     this.jogador.exibirMenu() 
     let decisao = parseInt(prompt("digite a opção desejada"))
     if(decisao === 1){
@@ -121,15 +136,17 @@ fase1(){
     this.jogador.loja()
   }
   if(decisao == 4){
-    this.usoSkils(this.jogador.skils)
+    this.usoSkills(this.jogador.skills)
   }
 
-  if(this.monstro.vida > 0){
+  if(this.monstro.vida > 0 && decisao != 2 && decisao != 3){
   console.log(`----------Vez do ${this.monstro.nome}----------`)
   this.jogador.receberDano(this.monstro.ataque)
   }
+  if(this.jogador.mana < 100 + this.jogador.tetoMana)
+  {
   this.jogador.mana += 20
-  
+  }
   
   }
   this.derrotados ++
@@ -183,7 +200,51 @@ this.monstro = new Monstro("Dragão")
 this.monstro.vida += 500
 this.monstro.ataque += 30
 console.log("O Dragão se levanta, abrindo suas asas\nÉ o momento de atacar")
+
+
 while(this.jogador.vida > 0 && this.monstro.vida > 0){
+
+let invocar = Math.trunc((Math.random()*10))
+if(invocar >= 7){
+
+  
+let Invocado = new Monstro("Servo")
+console.log("O Dragão invoca um de seus Servos")
+while(this.jogador.vida > 0 && Invocado.vida > 0)
+{
+
+  console.log("Sua vez")
+  this.jogador.exibirMenu() 
+  let decisao = parseInt(prompt("digite a opção desejada"))
+  if(decisao === 1){
+    Invocado.receberDano(this.jogador.ataque)
+  }
+if(decisao === 2){
+  console.clear()
+this.jogador.usarInventario()
+}
+if(decisao == 3){
+  this.jogador.loja()
+}
+if(decisao == 4){
+  this.usoSkils(this.jogador.skils)
+}
+
+if(Invocado.vida > 0 && decisao != 2 && decisao != 3){
+console.log(`----------Vez do ${Invocado.nome}----------`)
+this.jogador.receberDano(Invocado.ataque)
+}
+this.jogador.mana += 20
+this.jogador.moedas += 9
+if(Invocado.vida <0) {
+  console.log("O servo foi derrotado")
+}
+
+}
+
+
+}
+
 
   console.log("Sua vez")
   this.jogador.exibirMenu() 
@@ -202,7 +263,7 @@ if(decisao == 4){
   this.usoSkils(this.jogador.skils)
 }
 
-if(this.monstro.vida > 0){
+if(this.monstro.vida > 0 && decisao != 2 && decisao != 3){
 console.log(`----------Vez do ${this.monstro.nome}----------`)
 this.jogador.receberDano(this.monstro.ataque)
 }
@@ -231,7 +292,7 @@ class Monstro {
   this.vida = 100;
   this.ataque = 5;
   this.nome = nome;
-  this.experiencia = 50
+  this.experiencia = 50 ;
   this.drop = ["Poção de Cura", "Maçã Doce", "Poção de Força"]
 
  }
@@ -255,12 +316,12 @@ class Personagem {
       this.tetoMana = 0;
       this.inventario = ["Poção de Cura"];
       this.conquistas = [];
-      this.skils = [];
+      this.skills = [];
       this.moedas = 0;
     }
   
     exibirMenu() {
-      console.log("[1] Ataque básico \n[2] Acessar inventário\n[3] Acessar loja\n[4] Usar habilidades");
+      console.log(`Vida : ${this.vida}\nMana : ${this.mana}\nMoedas : ${this.moedas}\n------------------\n[1] Ataque básico \n[2] Acessar inventário\n[3] Acessar loja\n[4] Usar habilidades`);
     }
   
     usarInventario() {
